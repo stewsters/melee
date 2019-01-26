@@ -9,14 +9,16 @@ import org.jbox2d.dynamics.BodyDef
 import org.jbox2d.dynamics.BodyType
 import org.jbox2d.dynamics.FixtureDef
 import org.jbox2d.dynamics.World
+import org.jbox2d.dynamics.joints.DistanceJointDef
 import java.util.*
+
 
 class MeleeWorld(val xSize: Float, val ySize: Float) {
     val r = Random()
 
     val actors = mutableListOf<Actor>()
     val players = mutableListOf<Actor>()
-    val obstacles = mutableListOf<Obstacle>()
+    val obstacles = mutableListOf<Wall>()
 
     val world: World = World(Vec2(0f, 0f))
 
@@ -32,11 +34,12 @@ class MeleeWorld(val xSize: Float, val ySize: Float) {
         return Vector3(x.toFloat(), y.toFloat(), 0f)
     }
 
-    fun buildWalls(walls: List<Obstacle>) {
+    fun buildWalls(walls: List<Wall>) {
         // build walls
         walls.forEach {
             val wall = BodyDef()
             wall.type = BodyType.STATIC
+
             val body = world.createBody(wall)
 
             body.position.x = it.x
@@ -46,6 +49,7 @@ class MeleeWorld(val xSize: Float, val ySize: Float) {
             shape.setAsBox(it.xSize / 2f, it.ySize / 2f)
 
             body.createFixture(shape, 1f)
+
             it.body = body
 
             obstacles.add(it)
@@ -93,7 +97,7 @@ class MeleeWorld(val xSize: Float, val ySize: Float) {
             type = BodyType.DYNAMIC
 
             linearDamping = 0.8f
-            angularDamping = 0.8f
+            angularDamping = 0.7f
             bullet = true // fast moving
         }
         val body = world.createBody(bodyDef)
@@ -105,7 +109,7 @@ class MeleeWorld(val xSize: Float, val ySize: Float) {
         val fixtureDef = FixtureDef().apply {
             shape = bodyShape
             friction = 0.3f
-            restitution = 0.5f
+            restitution = 0.3f
             density = 1.0f // mass is calculated from this * area
         }
         body.createFixture(fixtureDef)
@@ -119,12 +123,38 @@ class MeleeWorld(val xSize: Float, val ySize: Float) {
             friction = 0.05f
             restitution = 3f
             density = 1.0f // mass is calculated from this * area
-
         }
 
         body.createFixture(swordFixtureDef)
 
-        val actor = Actor(body, bodyShape.radius * 2, bodyShape.radius * 2, controller)
+
+        // create ball
+//
+//        val ballBody = world.createBody(BodyDef().apply {
+//            position.x = x + 2
+//            position.y = y + 2
+//            angle = r.nextFloat() * Math.PI.toFloat() * 2f
+//            type = BodyType.DYNAMIC
+//
+//            linearDamping = 0.8f
+//            angularDamping = 0.7f
+//            bullet = true // fast moving
+//        })
+//
+//        ballBody.createFixture(FixtureDef().apply {
+//            shape = CircleShape().apply { radius = 10f }
+//            friction = 0.3f
+//            restitution = 0.3f
+//            density = 0.1f // mass is calculated from this * area
+//        })
+//
+//
+//        val defJoint = DistanceJointDef()
+//        defJoint.initialize(body, ballBody, Vec2(0f, 10f), Vec2(5f, 0f))
+//
+//        val joint = world.createJoint(defJoint)
+
+        val actor = Actor(body, bodyShape.radius * 2, bodyShape.radius * 2, controller, null)
         this.actors.add(actor)
         this.players.add(actor)
     }

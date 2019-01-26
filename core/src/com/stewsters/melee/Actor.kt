@@ -7,5 +7,6 @@ class Actor(
         val body: Body,
         val xSize: Float,
         val ySize: Float,
-        val controller: Controller? = null
+        val controller: Controller? = null,
+        val ballBody: Body?=null
 )

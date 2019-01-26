@@ -67,10 +67,10 @@ class MeleeGame : ApplicationAdapter() {
         }
 
         meleeWorld.buildWalls(listOf(
-                Obstacle(0f, 300f, 20f, 600f),
-                Obstacle(600f, 300f, 20f, 600f),
-                Obstacle(300f, 0f, 600f, 20f),
-                Obstacle(300f, 600f, 600f, 20f)
+                Wall(0f, 300f, 20f, 600f),
+                Wall(600f, 300f, 20f, 600f),
+                Wall(300f, 0f, 600f, 20f),
+                Wall(300f, 600f, 600f, 20f)
         ))
 
 
@@ -79,7 +79,7 @@ class MeleeGame : ApplicationAdapter() {
         var i = 0
 
         for (controller in controllers) {
-            val angle = i * dist
+            val angle = i++ * distPlayer
 
             val x = (cos(angle).toFloat() * meleeWorld.xSize / 4f) + meleeWorld.xSize / 2f
             val y = (sin(angle).toFloat() * meleeWorld.ySize / 4f) + meleeWorld.ySize / 2f
@@ -142,14 +142,12 @@ class MeleeGame : ApplicationAdapter() {
 
                     //         println("target ${Math.toDegrees(targetAngle)} current ${Math.toDegrees(currentAngle.toDouble())}")
 
-                    player.body.applyTorque(if (way) turnForce.toFloat() * 400_000f else turnForce.toFloat() * 400_000f)
+                    player.body.applyTorque(if (way) turnForce.toFloat() * 600_000f else turnForce.toFloat() * 600_000f)
 
                 }
 
             }
         }
-
-
 
 
         meleeWorld.world.step(Gdx.graphics.deltaTime, 5, 3)
@@ -192,6 +190,17 @@ class MeleeGame : ApplicationAdapter() {
                     1f, 1f,
                     toDegrees(actor.body.angle.toDouble()).toFloat()
             )
+
+            val ballPos = actor.ballBody?.position
+            if (ballPos != null)
+                spriteBatch.draw(
+                        playerTexture,
+                        ballPos.x - actor.xSize / 2, ballPos.y - actor.ySize / 2,
+                        actor.xSize / 2, actor.ySize / 2,
+                        actor.xSize / 2, actor.xSize / 2,
+                        1f, 1f,
+                        0f
+                )
         }
         spriteBatch.end();
 
