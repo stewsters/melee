@@ -46,7 +46,7 @@ class MeleeGame : ApplicationAdapter() {
 
         // Constructs a new OrthographicCamera, using the given viewport width and height
         // Height is multiplied by aspect ratio.
-        cam = OrthographicCamera(600f, 600 * (h / w))
+        cam = OrthographicCamera(800f, 800 * (h / w))
 
         shapeRenderer = ShapeRenderer()
         spriteBatch = SpriteBatch()
@@ -63,10 +63,7 @@ class MeleeGame : ApplicationAdapter() {
 
             println("${Math.toDegrees(angle)} $x $y")
 
-            meleeWorld.createObstacle(
-                    x,
-                    y
-            )
+            meleeWorld.createObstacle(x, y)
         }
 
         meleeWorld.buildWalls(listOf(
@@ -108,6 +105,7 @@ class MeleeGame : ApplicationAdapter() {
         spriteBatch.setProjectionMatrix(cam.combined)
         shapeRenderer.setProjectionMatrix(cam.combined)
 
+        Gdx.gl.glClearColor(0.2f, 0.2f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 
@@ -130,7 +128,7 @@ class MeleeGame : ApplicationAdapter() {
                     val normal = Vec2(armX, armY)
                     normal.normalize()
 
-                    var targetAngle = (Math.atan2(normal.y.toDouble(), normal.x.toDouble()) + Math.PI/2) % (twoPi)
+                    var targetAngle = (Math.atan2(normal.y.toDouble(), normal.x.toDouble()) + Math.PI / 2) % (twoPi)
 
                     var currentAngle = -player.body.angle % twoPi
 
@@ -142,9 +140,9 @@ class MeleeGame : ApplicationAdapter() {
 
                     val way = turnForce > 0
 
-                    println("target ${Math.toDegrees(targetAngle)} current ${Math.toDegrees(currentAngle.toDouble())}")
+                    //         println("target ${Math.toDegrees(targetAngle)} current ${Math.toDegrees(currentAngle.toDouble())}")
 
-                    player.body.applyTorque(if (way) turnForce.toFloat() * 200_000f else turnForce.toFloat() * 200_000f)
+                    player.body.applyTorque(if (way) turnForce.toFloat() * 400_000f else turnForce.toFloat() * 400_000f)
 
                 }
 
@@ -160,14 +158,29 @@ class MeleeGame : ApplicationAdapter() {
         for (obstacle in meleeWorld.obstacles) {
             shapeRenderer.rect(obstacle.x - obstacle.xSize / 2, obstacle.y - obstacle.ySize / 2, obstacle.xSize, obstacle.ySize)
         }
+
         shapeRenderer.end()
 
         spriteBatch.begin();
 
         // Draw ring
-        spriteBatch.draw(mapTexture, 0f, 0f, meleeWorld.xSize, meleeWorld.ySize)
+        spriteBatch.draw(mapTexture, 50f, 50f, meleeWorld.xSize - 100f, meleeWorld.ySize - 100f)
+        spriteBatch.end()
 
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled)
+        for (actor in meleeWorld.players) {
+            val pos = actor.body.position
+            shapeRenderer.rect(pos.x, pos.y,
+                    0f, 0f,
+                    5f, 30f,
+                    1f, 1f,
+                    toDegrees(actor.body.angle.toDouble()).toFloat()
+            )
 
+        }
+        shapeRenderer.end()
+
+        spriteBatch.begin();
         for (actor in meleeWorld.actors) {
             val pos = actor.body.position
 
@@ -179,7 +192,6 @@ class MeleeGame : ApplicationAdapter() {
                     1f, 1f,
                     toDegrees(actor.body.angle.toDouble()).toFloat()
             )
-
         }
         spriteBatch.end();
 

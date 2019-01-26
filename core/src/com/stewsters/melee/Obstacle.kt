@@ -7,6 +7,6 @@ class Obstacle(
         val y: Float,
         val xSize: Float,
         val ySize: Float
-){
-    var body:Body?=null
+) {
+    var body: Body? = null
 }
