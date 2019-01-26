@@ -130,7 +130,7 @@ class MeleeGame : ApplicationAdapter() {
                     val normal = Vec2(armX, armY)
                     normal.normalize()
 
-                    var targetAngle = (Math.atan2(normal.y.toDouble(), normal.x.toDouble()) + Math.PI) % (twoPi)
+                    var targetAngle = (Math.atan2(normal.y.toDouble(), normal.x.toDouble()) + Math.PI/2) % (twoPi)
 
                     var currentAngle = -player.body.angle % twoPi
 
@@ -138,11 +138,13 @@ class MeleeGame : ApplicationAdapter() {
                         currentAngle = (currentAngle + twoPi) % twoPi
                     }
 
-                    val way = (targetAngle > currentAngle)
+                    val turnForce = ((targetAngle + twoPi - currentAngle + twoPi) % twoPi) - Math.PI
+
+                    val way = turnForce > 0
 
                     println("target ${Math.toDegrees(targetAngle)} current ${Math.toDegrees(currentAngle.toDouble())}")
 
-                    player.body.applyTorque(if (way) -20_000f else 20_000f)
+                    player.body.applyTorque(if (way) turnForce.toFloat() * 200_000f else turnForce.toFloat() * 200_000f)
 
                 }
 
@@ -171,16 +173,13 @@ class MeleeGame : ApplicationAdapter() {
 
             spriteBatch.draw(
                     playerTexture,
-                    pos.x-actor.xSize / 2, pos.y - actor.ySize / 2,
+                    pos.x - actor.xSize / 2, pos.y - actor.ySize / 2,
                     actor.xSize / 2, actor.ySize / 2,
                     actor.xSize, actor.xSize,
                     1f, 1f,
                     toDegrees(actor.body.angle.toDouble()).toFloat()
             )
 
-//            actor.sprite.setCenter(pos.x, pos.y)
-//            actor.sprite.rotation = toDegrees(actor.body.angle.toDouble()).toFloat()
-//            actor.sprite.draw(spriteBatch);
         }
         spriteBatch.end();
 
